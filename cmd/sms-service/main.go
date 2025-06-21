@@ -29,7 +29,7 @@ func main() {
 
 func readConfig() error {
 	if err := godotenv.Load(); err != nil {
-		return fmt.Errorf("failed to load .env file: %w", err)
+		return fmt.Errorf("failed to load .env file: %v", err)
 	}
 
 	return nil
