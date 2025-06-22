@@ -11,6 +11,7 @@ const (
 )
 
 type Message struct {
+	// TODO: might look for other UUID options with PostgreSQL compatibility
 	ID        pgtype.UUID `json:"id"`
 	Status    string      `json:"status,omitempty"`
 	Recipient string      `json:"recipient"`

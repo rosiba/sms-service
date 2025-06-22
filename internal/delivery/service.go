@@ -15,6 +15,7 @@ const (
 
 type Service struct {
 	mr     repository.MessageRepository
+	cr     repository.CacheRepository
 	status string
 }
 
@@ -23,9 +24,10 @@ type DeliveryResult struct {
 	ExternalID string
 }
 
-func NewDeliveryService(mr repository.MessageRepository) *Service {
+func NewDeliveryService(mr repository.MessageRepository, cr repository.CacheRepository) *Service {
 	return &Service{
 		mr: mr,
+		cr: cr,
 	}
 }
 

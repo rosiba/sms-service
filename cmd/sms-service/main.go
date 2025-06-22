@@ -9,6 +9,7 @@ import (
 	"sms-service/internal/db"
 	"sms-service/internal/delivery"
 	"sms-service/internal/postgres"
+	rds "sms-service/internal/redis"
 )
 
 func main() {
@@ -31,7 +32,8 @@ func main() {
 	}
 
 	mr := postgres.NewMessageRepository(conn)
-	ds := delivery.NewDeliveryService(mr)
+	rr := rds.NewRedisRepository()
+	ds := delivery.NewDeliveryService(mr, rr)
 	go ds.Run()
 
 	log.Println("starting http server")

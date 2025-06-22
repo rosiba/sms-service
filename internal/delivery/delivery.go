@@ -79,5 +79,10 @@ func (s *Service) deliver(message model.Message, resultChan chan DeliveryResult,
 		return
 	}
 
+	if err := s.cr.SaveMessageTime(respBody.MessageID, sentAt); err != nil {
+		errChan <- fmt.Errorf("failed to save message time: %v", err)
+		return
+	}
+
 	log.Println("message successfully delivered")
 }
