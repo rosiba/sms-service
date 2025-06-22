@@ -3,7 +3,7 @@ package model
 import "time"
 
 type Model struct {
-	CreatedAt *time.Time
-	UpdatedAt *time.Time
-	DeletedAt *time.Time
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
 }

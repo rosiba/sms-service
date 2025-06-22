@@ -15,7 +15,7 @@ func (h *Handler) SendMessage(c *gin.Context) {
 	}
 
 	messageID, err := h.mr.SaveMessage(model.Message{
-		Recipient: requestBody.To,
+		Recipient: requestBody.Recipient,
 		Content:   requestBody.Content,
 	})
 	if err != nil {
@@ -33,8 +33,8 @@ func (h *Handler) SendMessage(c *gin.Context) {
 }
 
 type SendMessageRequest struct {
-	To      string `json:"to" binding:"required"`
-	Content string `json:"content" binding:"required,min=2,max=180"`
+	Recipient string `json:"recipient" binding:"required"`
+	Content   string `json:"content" binding:"required,min=2,max=180"`
 }
 
 type SendMessageResponse struct {

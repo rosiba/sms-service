@@ -8,11 +8,11 @@ const (
 )
 
 type Message struct {
-	ID        string
-	Status    string
-	Recipient string
-	Content   string
-	SentAt    *time.Time
+	ID        string     `json:"id"`
+	Status    string     `json:"status,omitempty"`
+	Recipient string     `json:"recipient"`
+	Content   string     `json:"content"`
+	SentAt    *time.Time `json:"sentAt,omitempty"`
 
 	Model
 }

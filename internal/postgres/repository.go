@@ -11,7 +11,7 @@ type PostgresRepository struct {
 	conn *pgxpool.Pool
 }
 
-func NewPostgresRepository(conn *pgxpool.Pool) *PostgresRepository {
+func NewMessageRepository(conn *pgxpool.Pool) *PostgresRepository {
 	return &PostgresRepository{
 		conn: conn,
 	}
