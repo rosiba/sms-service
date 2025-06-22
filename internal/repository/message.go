@@ -1,10 +1,14 @@
 package repository
 
-import "sms-service/internal/model"
+import (
+	"github.com/jackc/pgx/v5/pgtype"
+	"sms-service/internal/model"
+	"time"
+)
 
 type MessageRepository interface {
-	GetUnsentMessages(count uint) ([]model.Message, error)
+	GetPendingMessages(count uint) ([]model.Message, error)
 	GetSentMessages(count uint) ([]model.Message, error)
-	SetMessageStatus(messageID string, status string) error
 	SaveMessage(message model.Message) (string, error)
+	SetMessageAsSent(id pgtype.UUID, sentAt time.Time) error
 }
