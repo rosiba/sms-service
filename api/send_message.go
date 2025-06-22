@@ -2,22 +2,33 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
+	"sms-service/internal/model"
 )
 
-func SendMessage(c *gin.Context) {
+func (h *Handler) SendMessage(c *gin.Context) {
 	var requestBody SendMessageRequest
 	if err := c.ShouldBindBodyWithJSON(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// TODO: Push to DB
+	messageID, err := h.mr.SaveMessage(model.Message{
+		Recipient: requestBody.To,
+		Content:   requestBody.Content,
+	})
+	if err != nil {
+		log.Println("failed to save message:", err)
+		c.JSON(http.StatusInternalServerError, Response{
+			ErrorMessage: FailedSaveMessage,
+			Error:        err,
+		})
+	}
 
-	c.JSON(http.StatusOK, SendMessageResponse{
-		Message: "Accepted",
-		// TODO: Get UUID for message
-		MessageID: "123",
+	c.JSON(http.StatusCreated, SendMessageResponse{
+		Message:   MessageCreated,
+		MessageID: messageID,
 	})
 }
 
@@ -28,5 +39,5 @@ type SendMessageRequest struct {
 
 type SendMessageResponse struct {
 	Message   string `json:"message"`
-	MessageID string `json:"messageId"`
+	MessageID string `json:"message_id"`
 }

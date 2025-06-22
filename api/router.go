@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter() (*gin.Engine, error) {
+func NewRouter(h *Handler) (*gin.Engine, error) {
 	// TODO: set mode to final value before submission
 	//gin.SetMode(gin.ReleaseMode)
 
@@ -17,7 +17,7 @@ func NewRouter() (*gin.Engine, error) {
 	// TODO: add other middlewares if necessary
 
 	r.GET("/ping", Ping)
-	r.POST("/messages", SendMessage)
+	r.POST("/messages", h.SendMessage)
 
 	return r, nil
 }
