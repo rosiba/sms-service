@@ -5,4 +5,6 @@ type Message struct {
 	Status    string
 	Recipient string
 	Content   string
+
+	Model
 }

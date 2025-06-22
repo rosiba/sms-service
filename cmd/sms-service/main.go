@@ -17,7 +17,7 @@ func main() {
 		log.Fatalf("failed to read config: %v", err)
 	}
 
-	log.Println("starting a connection to  database")
+	log.Println("starting a connection to database")
 	conn, err := db.Connect()
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
