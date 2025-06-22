@@ -1,0 +1,51 @@
+services:
+  sms:
+    container_name: sms-service
+    image: sms-service:latest
+    build: .
+    restart: always
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    ports:
+      - ${WEB_PORT:-8080}:${WEB_PORT:-8080}
+    env_file:
+      - ".env"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${WEB_PORT:-8080}/ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 1s
+  redis:
+    container_name: redis-cache
+    image: redis:alpine # TODO: set static version
+    restart: always
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 10
+  postgres:
+    container_name: postgres-db
+    image: postgres:latest # TODO: set static version
+    restart: always
+    user: postgres
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+    env_file:
+      - ".env"
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db-data:
