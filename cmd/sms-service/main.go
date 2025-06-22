@@ -7,6 +7,7 @@ import (
 	"os"
 	"sms-service/api"
 	"sms-service/internal/db"
+	"sms-service/internal/postgres"
 )
 
 func main() {
@@ -28,8 +29,10 @@ func main() {
 		log.Fatalf("failed to initialize database: %v", err)
 	}
 
+	h := api.NewHandler(postgres.NewPostgresRepository(conn))
+
 	log.Println("starting http server")
-	router, err := api.NewRouter()
+	router, err := api.NewRouter(h)
 	if err != nil {
 		log.Fatalf("failed to create router: %v", err)
 	}
