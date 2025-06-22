@@ -8,10 +8,11 @@ import (
 
 const (
 	initSQL = `CREATE TABLE IF NOT EXISTS messages(
-    message_id serial PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     recipient VARCHAR(25) NOT NULL,
     content VARCHAR(200) NOT NULL,
     status VARCHAR(25) NOT NULL,
+    sent_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
