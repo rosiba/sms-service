@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"sms-service/api"
+	"sms-service/internal/db"
 )
 
 func main() {
@@ -14,6 +15,17 @@ func main() {
 	log.Println("loading environment variables")
 	if err := readConfig(); err != nil {
 		log.Fatalf("failed to read config: %v", err)
+	}
+
+	log.Println("starting a connection to  database")
+	conn, err := db.Connect()
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+	defer conn.Close()
+
+	if err := db.InitDB(conn); err != nil {
+		log.Fatalf("failed to initialize database: %v", err)
 	}
 
 	log.Println("starting http server")
