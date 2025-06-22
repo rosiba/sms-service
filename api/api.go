@@ -7,6 +7,7 @@ const (
 	InvalidRequestBody      = "Invalid request body"
 	FailedSaveMessage       = "Failed to save message"
 	MessageCreated          = "Message created with pending status"
+	FailedGetUnsentMessages = "Failed to get unsent messages"
 )
 
 type Response struct {

@@ -18,6 +18,7 @@ func NewRouter(h *Handler) (*gin.Engine, error) {
 
 	r.GET("/ping", Ping)
 	r.POST("/messages", h.SendMessage)
+	r.GET("/messages/sent", h.ListSentMessages)
 
 	return r, nil
 }
