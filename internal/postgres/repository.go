@@ -67,34 +67,6 @@ func (p *PostgresRepository) GetSentMessages(count uint) ([]model.Message, error
 	return messages, nil
 }
 
-func (p *PostgresRepository) SetMessageStatus(id pgtype.UUID, status string) error {
-	ctx := context.Background()
-	tx, err := p.conn.Begin(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to start transaction: %w", err)
-	}
-	t, err := tx.Exec(ctx, "UPDATE messages SET status = $1 WHERE id = $2", status, id)
-	if err != nil {
-		if err := tx.Rollback(ctx); err != nil {
-			return fmt.Errorf("failed to rollback transaction: %w", err)
-		}
-		return fmt.Errorf("failed to set status: %w", err)
-	}
-
-	if err := tx.Commit(ctx); err != nil {
-		if err := tx.Rollback(ctx); err != nil {
-			return fmt.Errorf("failed to rollback transaction: %w", err)
-		}
-		return fmt.Errorf("failed to commit transaction(rollback applied): %w", err)
-	}
-
-	if t.RowsAffected() == 0 {
-		return fmt.Errorf("no lines affected")
-	}
-
-	return nil
-}
-
 func (p *PostgresRepository) SaveMessage(message model.Message) (string, error) {
 	ctx := context.Background()
 	tx, err := p.conn.Begin(ctx)

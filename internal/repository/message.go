@@ -9,7 +9,6 @@ import (
 type MessageRepository interface {
 	GetPendingMessages(count uint) ([]model.Message, error)
 	GetSentMessages(count uint) ([]model.Message, error)
-	SetMessageStatus(id pgtype.UUID, status string) error
 	SaveMessage(message model.Message) (string, error)
 	SetMessageAsSent(id pgtype.UUID, sentAt time.Time) error
 }
