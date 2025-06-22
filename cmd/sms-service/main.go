@@ -35,7 +35,7 @@ func main() {
 	go ds.Run()
 
 	log.Println("starting http server")
-	h := api.NewHandler(mr)
+	h := api.NewHandler(mr, ds)
 	router, err := api.NewRouter(h)
 	if err != nil {
 		log.Fatalf("failed to create router: %v", err)

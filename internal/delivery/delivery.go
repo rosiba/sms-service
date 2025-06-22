@@ -1,71 +1,83 @@
 package delivery
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
+	"net/http"
+	"os"
 	"sms-service/internal/model"
-	"sms-service/internal/repository"
 	"time"
 )
 
-const (
-	DeliveryStatusON       = "ON"
-	DeliveryStatusOFF      = "OFF"
-	Interval               = 2 * time.Second
-	ConcurrentMessageCount = 2
-)
+const DeliveryAccepted = "Accepted"
 
-type Service struct {
-	mr     repository.MessageRepository
-	status string
+type DeliveryRequest struct {
+	To      string `json:"to"`
+	Content string `json:"content"`
 }
 
-type DeliveryResult struct {
-	MessageID  string
-	ExternalID string
+type DeliveryResponse struct {
+	Message   string `json:"message"`
+	MessageID string `json:"messageId"`
 }
 
-func NewDeliveryService(mr repository.MessageRepository) *Service {
-	return &Service{
-		mr: mr,
+func (s *Service) deliver(message model.Message, resultChan chan DeliveryResult, errChan chan error) {
+	c := &http.Client{
+		Timeout: Interval,
 	}
-}
 
-func (s *Service) Run() {
-	log.Println("delivery service started")
-	ticker := time.NewTicker(Interval)
-	resultChan := make(chan DeliveryResult)
-	errorChan := make(chan error)
-	for {
-		select {
-		case <-ticker.C:
-			if s.status == DeliveryStatusON {
-				messages, err := s.mr.GetUnsentMessages(ConcurrentMessageCount)
-				if err != nil {
-					log.Println("error getting unsent messages", err)
-					continue
-				}
-				for _, message := range messages {
-					go deliver(message, resultChan, errorChan)
-				}
-			}
-		case r := <-resultChan:
-			log.Println(r.ExternalID)
-			if err := s.mr.SetMessageStatus(r.MessageID, model.MessageStatusSent); err != nil {
-				errorChan <- fmt.Errorf("error setting message status: %v", err)
-				continue
-			}
-			// TODO: cache to redis
-		case err := <-errorChan:
-			log.Println(err.Error())
-		}
+	url := os.Getenv("DELIVERY_URL")
+	if url == "" {
+		errChan <- errors.New("DELIVERY_URL environment variable not set")
+		return
 	}
-}
 
-func (s *Service) Start() {
-	s.status = DeliveryStatusON
-}
+	reqBody, err := json.Marshal(DeliveryRequest{
+		To:      message.Recipient,
+		Content: message.Content,
+	})
+	if err != nil {
+		errChan <- fmt.Errorf("failed to unmarshal request body: %v", err)
+		return
+	}
 
-func (s *Service) Stop() {
-	s.status = DeliveryStatusOFF
+	request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
+	if err != nil {
+		errChan <- fmt.Errorf("failed to create request: %v", err)
+		return
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("x-ins-auth-key", os.Getenv("DELIVERY_AUTH_KEY"))
+
+	resp, err := c.Do(request)
+	if err != nil {
+		errChan <- fmt.Errorf("failed to send request: %v", err)
+		return
+	}
+	sentAt := time.Now()
+	if resp.StatusCode != http.StatusAccepted {
+		errChan <- fmt.Errorf("failed to deliver message: status %s", resp.Status)
+		return
+	}
+
+	respBody := DeliveryResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(&respBody); err != nil {
+		errChan <- fmt.Errorf("failed to decode response body: %v", err)
+		return
+	}
+	if respBody.Message != DeliveryAccepted {
+		errChan <- fmt.Errorf("failed to deliver message: status %s", respBody.Message)
+		return
+	}
+
+	if err := s.mr.SetMessageAsSent(message.ID, sentAt); err != nil {
+		errChan <- fmt.Errorf("error setting message status: %v", err)
+		return
+	}
+
+	log.Println("message successfully delivered")
 }

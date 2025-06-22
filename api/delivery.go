@@ -22,12 +22,12 @@ func (h *Handler) StartStopDelivery(c *gin.Context) {
 
 	switch requestBody.Action {
 	case ActionStart:
-		// TODO: set delivery status ON
+		h.ds.Start()
 		c.JSON(http.StatusOK, Response{
 			Message: DeliveryStartSuccessful,
 		})
 	case ActionStop:
-		// TODO: set delivery status OFF
+		h.ds.Stop()
 		c.JSON(http.StatusOK, Response{
 			Message: DeliveryStopSuccessful,
 		})
