@@ -1,0 +1,197 @@
+openapi: 3.0.4
+info:
+  title: SMS Service
+  description: |-
+    This is an SMS service project intended to be a submission. The project takes messages and sends them to a delivery service periodically.
+  termsOfService: https://github.com/rosiba/sms-service
+  contact:
+    email: rojbalka@gmail.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.12
+externalDocs:
+  description: Find out more on Github
+  url: https://github.com/rosiba/sms-service
+servers:
+  - url: http://localhost:9999
+tags:
+  - name: server
+    description: Endpoints directly related with server itself
+  - name: message
+    description: Manage SMS on the service
+  - name: service
+    description: Manage SMS Delivery Service
+paths:
+  /ping:
+    get:
+      tags:
+        - server
+      summary: pings server
+      operationId: ping
+      responses:
+        '200':
+          description: server healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pong'
+        default:
+          description: server down
+  /messages:
+    post:
+      tags:
+        - message
+      summary: Adds a new message.
+      description: Add a new message to the queue, with the status "pending".
+      operationId: addMessage
+      requestBody:
+        description: Create a new message to be sent
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+        required: true
+      responses:
+        '201':
+          description: Message saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /messages/sent:
+    get:
+      tags:
+        - message
+      summary: List sent messages
+      description: List sent messages with given count
+      operationId: listSentMessages
+      responses:
+        '200':
+          description: Successfully returned a list of sent messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+  /service/status:
+    put:
+      tags:
+        - service
+      summary: Start/stop SMS service
+      description: Change server status ON and OFF to start/stop SMS delivery
+      operationId: changeStatus
+      requestBody:
+        description: Set the action to start or stop service
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartStopRequest'
+        required: true
+
+      responses:
+        '200':
+          description: Successfully changed service status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartStopResponse"
+        default:
+          description: Failed to change service status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    SendMessageRequest:
+      required:
+        - recipient
+        - content
+      type: object
+      properties:
+        recipient:
+          type: string
+          example: "+90 530 123 45 67"
+        content:
+          type: string
+          example: selam ben Sinan
+    SendMessageResponse:
+      required:
+        - message
+        - message_id
+      type: object
+      properties:
+        message:
+          type: string
+          format: string
+          example: Message created with pending status
+        message_id:
+          type: string
+          format: string
+          example: 14204d36-7e4c-4d7e-a1d9-286c7cf41eb6
+    StartStopRequest:
+      required:
+        - action
+      type: object
+      properties:
+        action:
+          type: string
+          example: start
+          enum:
+            - start
+            - stop
+    StartStopResponse:
+      required:
+        - message
+      type: object
+      properties:
+        message:
+          type: string
+          example: Message delivery started successfully
+    Message:
+      required:
+        - recipient
+        - content
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: a60f07c2-71a9-450a-b62a-6ba4389db503
+        recipient:
+          type: string
+          example: +90 530 123 45 67
+        content:
+          type: string
+          example: selam ben Sinan
+        status:
+          type: string
+          description: status of the SMS, either pending or sent
+          enum:
+            - pending
+            - sent
+    Pong:
+      type: object
+      properties:
+        message:
+          type: string
+          example: pong
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Field validation for 'Content' failed on the 'required' tag"
+        error_message:
+          type: string
+          example: Missing required field
+      required:
+        - error
