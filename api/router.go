@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,6 +15,7 @@ func NewRouter(h *Handler) (*gin.Engine, error) {
 		return nil, fmt.Errorf("failed to set trusted proxies: %v", err)
 	}
 
+	r.Use(cors.Default())
 	// TODO: add other middlewares if necessary
 
 	r.GET("/ping", Ping)
