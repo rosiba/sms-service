@@ -11,3 +11,9 @@ up:
 
 restart:
 	docker compose restart
+
+rm:
+	docker compose rm -fsv
+	docker image rm -f sms-service
+
+all: rm build up

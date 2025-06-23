@@ -9,7 +9,7 @@ import (
 const (
 	DeliveryStatusON       = "ON"
 	DeliveryStatusOFF      = "OFF"
-	Interval               = 2 * time.Second
+	Interval               = 2 * time.Minute
 	ConcurrentMessageCount = 2
 )
 
