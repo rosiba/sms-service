@@ -7,8 +7,7 @@ import (
 )
 
 func NewRouter(h *Handler) (*gin.Engine, error) {
-	// TODO: set mode to final value before submission
-	//gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.ReleaseMode)
 
 	r := gin.Default()
 	if err := r.SetTrustedProxies(nil); err != nil {
@@ -16,7 +15,6 @@ func NewRouter(h *Handler) (*gin.Engine, error) {
 	}
 
 	r.Use(cors.Default())
-	// TODO: add other middlewares if necessary
 
 	r.GET("/ping", Ping)
 	r.POST("/messages", h.SendMessage)

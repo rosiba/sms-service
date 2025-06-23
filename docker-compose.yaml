@@ -21,7 +21,7 @@ services:
       start_period: 1s
   redis:
     container_name: redis-cache
-    image: redis:alpine # TODO: set static version
+    image: redis:alpine
     restart: always
     ports:
       - "6379:6379"
@@ -32,7 +32,7 @@ services:
       retries: 10
   postgres:
     container_name: postgres-db
-    image: postgres:latest # TODO: set static version
+    image: postgres:alpine
     restart: always
     user: postgres
     volumes:

@@ -7,11 +7,11 @@ import (
 )
 
 func (h *Handler) ListSentMessages(c *gin.Context) {
+	const DefaultLimit = 10
 	queryCount := c.Query("count")
 	count, err := strconv.ParseUint(queryCount, 10, 32)
 	if err != nil || queryCount == "" {
-		// TODO: set default count as a constant
-		count = 100
+		count = DefaultLimit
 	}
 
 	messages, err := h.mr.GetSentMessages(uint(count))
