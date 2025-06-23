@@ -11,7 +11,7 @@ To start the service,
 
 Rename `.env.example` to `.env` and simply run:
 ```shell
-    make up
+  make up
 ```
 
 If you made changes in the environment file, run build first:
@@ -22,7 +22,7 @@ If you made changes in the environment file, run build first:
 
 Made changes, left out things, not sure which version is working? run:
 ```shell
-    make all
+  make all
 ```
 This will completely save you from mess.
 
