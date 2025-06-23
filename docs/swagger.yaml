@@ -2,7 +2,7 @@ openapi: 3.0.4
 info:
   title: SMS Service
   description: |-
-    This is an SMS service project intended to be a submission. The project does not delivers the SMS but sends them to a delivery service defined in its environment file.
+    This is an SMS service project intended to be a submission. The project takes messages and sends them to a delivery service periodically.
   termsOfService: https://github.com/rosiba/sms-service
   contact:
     email: rojbalka@gmail.com
